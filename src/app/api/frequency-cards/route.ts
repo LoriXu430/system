@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { frequencyCards, customers, services, orders } from "@/lib/db/schema";
 import { eq, and, SQL, desc } from "drizzle-orm";
 
@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
+  const db = await getDb();
 
   const { searchParams } = request.nextUrl;
   const customerId = searchParams.get("customer_id");
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
+  const db = await getDb();
 
   const body = await request.json();
   const { customer_id, service_id, name, total_times, total_amount, expire_date } = body;

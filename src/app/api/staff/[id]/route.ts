@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
@@ -12,6 +12,7 @@ export async function GET(
   if (!session?.user?.storeId) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
+  const db = await getDb();
 
   const { id } = await params;
 
@@ -35,6 +36,7 @@ export async function PUT(
   if (!session?.user?.storeId) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
+  const db = await getDb();
 
   const { id } = await params;
   const body = await request.json();
@@ -82,6 +84,7 @@ export async function PATCH(
   if (!session?.user?.storeId) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
+  const db = await getDb();
 
   const { id } = await params;
 

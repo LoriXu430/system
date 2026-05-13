@@ -42,3 +42,10 @@ next-env.d.ts
 
 # database
 /data/
+
+# cloudflare
+/.open-next/
+/.wrangler/
+
+# trae
+.trae/

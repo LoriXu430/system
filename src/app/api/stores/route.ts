@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { stores } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -9,6 +9,7 @@ export async function GET() {
   if (!session?.user?.storeId) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
+  const db = await getDb();
 
   const store = await db.query.stores.findFirst({
     where: eq(stores.id, session.user.storeId),
@@ -26,6 +27,7 @@ export async function PUT(request: Request) {
   if (!session?.user?.storeId) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
+  const db = await getDb();
 
   const body = await request.json();
   const { name, address, phone, businessHours } = body;

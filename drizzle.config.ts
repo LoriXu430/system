@@ -5,6 +5,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'sqlite',
   dbCredentials: {
-    url: './data/toudaotang.db',
+    url: '.wrangler/state/v3/d1/miniflare-D1DatabaseObject/YOUR_LOCAL_D1_DB.sqlite',
   },
 });

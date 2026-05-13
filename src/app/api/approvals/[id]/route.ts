@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { approvals } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -12,6 +12,7 @@ export async function PATCH(
   if (!session?.user) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
+  const db = await getDb();
 
   const { id } = await params;
   const body = await request.json();

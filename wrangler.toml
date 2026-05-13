@@ -1,0 +1,21 @@
+name = "toudaotang-system"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# 使用 Cloudflare Workers + Assets 部署（@opennextjs/cloudflare）
+main = ".open-next/worker.js"
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "toudaotang-db"
+database_id = "dc5f74dc-d296-4c6b-804d-e59b4b933d54"
+migrations_dir = "drizzle"
+
+[vars]
+AUTH_TRUST_HOST = "true"
+NEXTAUTH_URL = "https://toudaotang-system.lorixu100.workers.dev"
+# AUTH_SECRET 通过 `wrangler secret put AUTH_SECRET` 设置，不提交到代码仓库

@@ -17,8 +17,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 |------|------|
 | 框架 | Next.js 16 (App Router) + React 19 + TypeScript |
 | 样式 | Tailwind CSS v4 + shadcn/ui |
-| 数据库 | SQLite (better-sqlite3) + Drizzle ORM |
+| 数据库 | Cloudflare D1 (SQLite 兼容) + Drizzle ORM |
 | 认证 | NextAuth.js v5 (手机号+密码，多角色) |
+| 部署 | Cloudflare Pages + D1 (@opennextjs/cloudflare) |
 | 包管理 | npm |
 
 ## 目录结构
@@ -125,12 +126,25 @@ src/
 
 ## 开发指南
 
-### 启动项目
+### 启动项目（本地开发）
 
 ```bash
-npm install          # 安装依赖
-npm run db:seed      # 初始化数据库 + 种子数据（首次）
-npm run dev          # 启动开发服务器 (http://localhost:3000)
+npm install             # 安装依赖
+npm run db:seed        # 初始化本地 D1 数据库 + 种子数据
+npm run dev            # 启动本地开发服务器 (http://localhost:3000)
+```
+
+### Cloudflare 部署
+
+```bash
+npx wrangler login                      # 登录 Cloudflare（首次）
+npx wrangler d1 create toudaotang-db    # 创建 D1 数据库
+npx wrangler d1 migrations apply toudaotang-db --remote   # 推送 schema
+npm run db:seed:remote                  # 填充种子数据到远程
+npm run build:worker                    # 构建 Worker 包（输出到 .open-next/）
+npx wrangler pages project create toudaotang-system --production-branch main  # 创建 Pages 项目
+npx wrangler pages deploy               # 部署到 Cloudflare Pages
+npx wrangler pages secret put AUTH_SECRET  # 设置 NextAuth 密钥
 ```
 
 ### 默认测试账号
@@ -145,20 +159,34 @@ npm run dev          # 启动开发服务器 (http://localhost:3000)
 ### 常用命令
 
 ```bash
-npm run db:generate  # 生成 Drizzle 迁移
-npm run db:migrate   # 执行迁移
-npm run db:studio    # 打开 Drizzle Studio（数据库可视化）
-npm run build        # 生产构建
+npm run dev             # 本地开发
+npm run build           # Next.js 构建
+npm run build:worker    # Cloudflare Worker 构建
+npm run preview         # 本地预览 Worker
+npm run deploy          # 部署到 Cloudflare Pages
+npm run db:generate     # 生成 Drizzle 迁移
+npm run db:migrate:local   # 执行本地迁移
+npm run db:migrate:remote  # 执行远程迁移
+npm run db:seed         # 填充本地种子数据
+npm run db:seed:remote  # 填充远程种子数据
+npm run db:studio       # 打开 Drizzle Studio
 ```
 
 ## 编码规范
 
 1. **API 路由**：全部放在 `src/app/api/` 下，使用 RESTful 风格，返回 `NextResponse.json()`
 2. **页面组件**：使用 `"use client"` 指令，通过 `fetch` 调用 API
-3. **数据库操作**：统一使用 Drizzle ORM，不直接写 SQL
+3. **数据库操作**：统一使用 Drizzle ORM，不直接写 SQL；每个 handler 中用 `const db = await getDb()` 获取数据库实例
 4. **认证**：通过 `getServerSession` 或 middleware 校验，角色判断在 middleware.ts
 5. **UI 组件**：优先使用 `src/components/ui/` 中的 shadcn 组件
-6. **数据库文件**：SQLite 文件存于 `data/` 目录，已在 .gitignore 中忽略
+6. **数据库**：使用 Cloudflare D1，迁移文件在 `drizzle/` 目录，种子数据在 `scripts/seed.sql`
+
+## 部署信息
+
+- **生产地址**：https://toudaotang-system.lorixu100.workers.dev
+- **部署方式**：Cloudflare Workers + Assets（`wrangler deploy`）
+- **D1 数据库 ID**：dc5f74dc-d296-4c6b-804d-e59b4b933d54
+- **Cloudflare 账号 ID**：f2a3d378b5fc31bde8c143eaf88f4549
 
 ## 核心业务流程
 

@@ -1,18 +1,10 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { drizzle, DrizzleD1Database } from 'drizzle-orm/d1';
 import * as schema from './schema';
-import path from 'path';
-import fs from 'fs';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-const dbPath = path.join(process.cwd(), 'data', 'toudaotang.db');
-const dbDir = path.dirname(dbPath);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
+export type DB = DrizzleD1Database<typeof schema>;
+
+export async function getDb(): Promise<DB> {
+  const { env } = await getCloudflareContext<CloudflareEnv>();
+  return drizzle(env.DB, { schema });
 }
-
-const sqlite = new Database(dbPath);
-sqlite.pragma('journal_mode = WAL');
-sqlite.pragma('foreign_keys = ON');
-
-export const db = drizzle(sqlite, { schema });
-export type DB = typeof db;

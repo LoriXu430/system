@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, and, or, like } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
   if (!session?.user?.storeId) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
+  const db = await getDb();
 
   const searchParams = request.nextUrl.searchParams;
   const search = searchParams.get("search");
@@ -52,6 +53,7 @@ export async function POST(request: Request) {
   if (!session?.user?.storeId) {
     return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
+  const db = await getDb();
 
   const body = await request.json();
   const { name, phone, role } = body;

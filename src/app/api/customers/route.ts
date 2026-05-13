@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { customers } from "@/lib/db/schema";
 import { like, or, sql, desc } from "drizzle-orm";
 
@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
+  const db = await getDb();
 
   const searchParams = request.nextUrl.searchParams;
   const search = searchParams.get("search") || "";
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
+  const db = await getDb();
 
   const body = await request.json();
   const { name, phone, gender, notes } = body;
