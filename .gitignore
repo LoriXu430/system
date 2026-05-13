@@ -46,6 +46,3 @@ next-env.d.ts
 # cloudflare
 /.open-next/
 /.wrangler/
-
-# trae
-.trae/
